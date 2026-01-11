@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MessageSquare, Send, CheckCircle2, Bus, User, Smartphone, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -12,6 +11,7 @@ interface FeedbackCategory {
   label: string;
   description: string;
   icon: typeof Bus;
+  bgClass: string;
 }
 
 const feedbackCategories: FeedbackCategory[] = [
@@ -21,6 +21,7 @@ const feedbackCategories: FeedbackCategory[] = [
     label: 'Bus',
     description: 'Condition, cleanliness, timing',
     icon: Bus,
+    bgClass: 'bg-blue-100 text-blue-600',
   },
   {
     id: '2',
@@ -28,6 +29,7 @@ const feedbackCategories: FeedbackCategory[] = [
     label: 'Driver',
     description: 'Behavior, driving, punctuality',
     icon: User,
+    bgClass: 'bg-green-100 text-green-600',
   },
   {
     id: '3',
@@ -35,6 +37,7 @@ const feedbackCategories: FeedbackCategory[] = [
     label: 'App',
     description: 'Features, bugs, suggestions',
     icon: Smartphone,
+    bgClass: 'bg-purple-100 text-purple-600',
   },
   {
     id: '4',
@@ -42,6 +45,7 @@ const feedbackCategories: FeedbackCategory[] = [
     label: 'Safety',
     description: 'Safety concerns and issues',
     icon: Shield,
+    bgClass: 'bg-red-100 text-red-600',
   },
 ];
 
@@ -90,19 +94,21 @@ export default function Feedback() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <PageHeader 
         title="Feedback" 
-        subtitle="Share your suggestions and concerns"
+        subtitle="Share your suggestions and report issues"
+        icon={MessageSquare}
+        iconColorClass="bg-blue-100 text-blue-600"
       />
 
-      <main className="px-4 -mt-4 pb-8 safe-bottom">
-        <div className="container max-w-lg mx-auto">
+      <main className="px-6 pb-8">
+        <div className="container max-w-4xl mx-auto">
           {/* Success State */}
           {isSuccess ? (
-            <div className="card-elevated p-8 text-center animate-scale-in">
-              <div className="w-20 h-20 rounded-full bg-success/10 mx-auto mb-4 flex items-center justify-center">
-                <CheckCircle2 className="w-10 h-10 text-success" />
+            <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
+              <div className="w-20 h-20 rounded-full bg-green-100 mx-auto mb-4 flex items-center justify-center">
+                <CheckCircle2 className="w-10 h-10 text-green-600" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-2">Thank You!</h3>
               <p className="text-muted-foreground">
@@ -112,12 +118,12 @@ export default function Feedback() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Category Selection */}
-              <div className="card-elevated p-4 animate-fade-in">
+              <div className="bg-white rounded-2xl border border-gray-100 p-6">
                 <label className="block font-semibold text-foreground mb-3">
                   Select Category
                 </label>
                 <div className="grid grid-cols-2 gap-3">
-                  {feedbackCategories.map((cat, index) => (
+                  {feedbackCategories.map((cat) => (
                     <button
                       key={cat.id}
                       type="button"
@@ -125,13 +131,12 @@ export default function Feedback() {
                       className={`p-4 rounded-xl border-2 text-left transition-all ${
                         category === cat.value
                           ? 'border-primary bg-primary/5'
-                          : 'border-border hover:border-primary/50 bg-card'
+                          : 'border-gray-200 hover:border-gray-300 bg-white'
                       }`}
-                      style={{ animationDelay: `${0.1 * index}s` }}
                     >
-                      <cat.icon className={`w-6 h-6 mb-2 ${
-                        category === cat.value ? 'text-primary' : 'text-muted-foreground'
-                      }`} />
+                      <div className={`w-10 h-10 rounded-xl ${cat.bgClass} flex items-center justify-center mb-2`}>
+                        <cat.icon className="w-5 h-5" />
+                      </div>
                       <div className="font-medium text-foreground">{cat.label}</div>
                       <div className="text-xs text-muted-foreground mt-0.5">{cat.description}</div>
                     </button>
@@ -140,7 +145,7 @@ export default function Feedback() {
               </div>
 
               {/* Feedback Message */}
-              <div className="card-elevated p-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <div className="bg-white rounded-2xl border border-gray-100 p-6">
                 <label className="block font-semibold text-foreground mb-3">
                   Your Feedback
                 </label>
@@ -157,28 +162,26 @@ export default function Feedback() {
               </div>
 
               {/* Submit Button */}
-              <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting || !category || !message.trim()}
-                  className="w-full gradient-accent text-accent-foreground"
-                >
-                  {isSubmitting ? (
-                    'Submitting...'
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4 mr-2" />
-                      Submit Feedback
-                    </>
-                  )}
-                </Button>
-              </div>
+              <Button
+                type="submit"
+                disabled={isSubmitting || !category || !message.trim()}
+                className="w-full h-12 bg-[hsl(190,55%,55%)] hover:bg-[hsl(190,55%,50%)] text-white text-base font-medium"
+              >
+                {isSubmitting ? (
+                  'Submitting...'
+                ) : (
+                  <>
+                    <Send className="w-5 h-5 mr-2" />
+                    Submit Feedback
+                  </>
+                )}
+              </Button>
 
               {/* Tips */}
-              <div className="card-elevated p-4 bg-secondary/50 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+              <div className="bg-white rounded-2xl border border-gray-100 p-6">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                    <MessageSquare className="w-5 h-5 text-primary" />
+                  <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                    <MessageSquare className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
                     <h4 className="font-medium text-foreground">Tips for Good Feedback</h4>

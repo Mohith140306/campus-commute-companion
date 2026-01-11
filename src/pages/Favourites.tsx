@@ -2,11 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { mockBuses, getStatusColor, getStatusText } from '@/lib/mockData';
 import { useFavourites } from '@/hooks/useFavourites';
-import { Star, Navigation, Plus, Trash2, Bus as BusIcon, Clock } from 'lucide-react';
+import { Star, Navigation, Plus, Trash2, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Favourites() {
@@ -38,20 +37,22 @@ export default function Favourites() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <PageHeader 
         title="My Favourites" 
-        subtitle="Quick access to your saved buses"
+        subtitle="Quick access to your saved bus routes"
+        icon={Star}
+        iconColorClass="bg-amber-100 text-amber-600"
       />
 
-      <main className="px-4 -mt-4 pb-8 safe-bottom">
-        <div className="container max-w-lg mx-auto space-y-4">
+      <main className="px-6 pb-8">
+        <div className="container max-w-4xl mx-auto space-y-4">
           {/* Add Favourite Section */}
-          <div className="card-elevated p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl border border-gray-100 p-6">
             <h3 className="font-semibold text-foreground mb-3">Add to Favourites</h3>
             <div className="flex gap-2">
               <Select value={selectedBusId} onValueChange={setSelectedBusId}>
-                <SelectTrigger className="flex-1">
+                <SelectTrigger className="flex-1 h-12">
                   <SelectValue placeholder="Select a bus" />
                 </SelectTrigger>
                 <SelectContent>
@@ -75,9 +76,9 @@ export default function Favourites() {
               <Button
                 onClick={handleAddFavourite}
                 disabled={!selectedBusId}
-                className="gradient-accent text-accent-foreground shrink-0"
+                className="h-12 px-4 bg-amber-500 hover:bg-amber-600 text-white shrink-0"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-5 h-5" />
               </Button>
             </div>
           </div>
@@ -86,22 +87,21 @@ export default function Favourites() {
           {favouriteBuses.length > 0 ? (
             <div className="space-y-3">
               <h3 className="font-semibold text-foreground px-1">Your Favourites</h3>
-              {favouriteBuses.map((bus, index) => (
+              {favouriteBuses.map((bus) => (
                 <div
                   key={bus.id}
-                  className="card-elevated p-4 animate-fade-in"
-                  style={{ animationDelay: `${0.1 * index}s` }}
+                  className="bg-white rounded-2xl border border-gray-100 p-4"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center shrink-0">
-                        <Star className="w-6 h-6 text-warning fill-warning" />
+                      <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+                        <Star className="w-6 h-6 text-amber-500 fill-amber-500" />
                       </div>
                       <div>
                         <h4 className="font-semibold text-foreground">{bus.busNumber}</h4>
                         <p className="text-sm text-muted-foreground">{bus.routeName}</p>
                         <div className="flex items-center gap-3 mt-2">
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium text-primary-foreground ${getStatusColor(bus.status)}`}>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium text-white ${getStatusColor(bus.status)}`}>
                             {getStatusText(bus.status)}
                           </span>
                           <span className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -123,7 +123,7 @@ export default function Favourites() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
                         onClick={() => handleRemoveFavourite(bus.busNumber)}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -134,9 +134,9 @@ export default function Favourites() {
               ))}
             </div>
           ) : (
-            <div className="card-elevated p-8 text-center animate-fade-in">
-              <div className="w-16 h-16 rounded-full bg-warning/10 mx-auto mb-4 flex items-center justify-center">
-                <Star className="w-8 h-8 text-warning" />
+            <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
+              <div className="w-16 h-16 rounded-full bg-amber-100 mx-auto mb-4 flex items-center justify-center">
+                <Star className="w-8 h-8 text-amber-500" />
               </div>
               <h3 className="font-semibold text-foreground mb-2">No Favourites Yet</h3>
               <p className="text-sm text-muted-foreground">
