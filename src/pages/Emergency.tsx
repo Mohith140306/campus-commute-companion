@@ -12,7 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Wrench, Car, Stethoscope, ShieldAlert, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Wrench, Car, Heart, ShieldCheck, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface EmergencyType {
@@ -21,8 +21,8 @@ interface EmergencyType {
   title: string;
   description: string;
   icon: typeof Wrench;
-  colorClass: string;
   bgClass: string;
+  iconBgClass: string;
 }
 
 const emergencyTypes: EmergencyType[] = [
@@ -30,37 +30,37 @@ const emergencyTypes: EmergencyType[] = [
     id: '1',
     type: 'breakdown',
     title: 'Bus Breakdown',
-    description: 'Report a bus that has broken down',
+    description: 'Report mechanical failure or breakdown',
     icon: Wrench,
-    colorClass: 'text-warning',
-    bgClass: 'bg-warning/10 hover:bg-warning/20',
+    bgClass: 'bg-white border-gray-200 hover:border-orange-300',
+    iconBgClass: 'bg-orange-500',
   },
   {
     id: '2',
     type: 'accident',
     title: 'Accident',
-    description: 'Report an accident or collision',
+    description: 'Report road accident or collision',
     icon: Car,
-    colorClass: 'text-destructive',
-    bgClass: 'bg-destructive/10 hover:bg-destructive/20',
+    bgClass: 'bg-white border-red-200 hover:border-red-400',
+    iconBgClass: 'bg-red-500',
   },
   {
     id: '3',
     type: 'medical',
     title: 'Medical Emergency',
-    description: 'Request medical assistance',
-    icon: Stethoscope,
-    colorClass: 'text-emergency',
-    bgClass: 'bg-emergency/10 hover:bg-emergency/20',
+    description: 'Request immediate medical assistance',
+    icon: Heart,
+    bgClass: 'bg-white border-gray-200 hover:border-pink-300',
+    iconBgClass: 'bg-pink-500',
   },
   {
     id: '4',
     type: 'women_safety',
     title: 'Women Safety',
-    description: 'Report safety concerns for women',
-    icon: ShieldAlert,
-    colorClass: 'text-accent',
-    bgClass: 'bg-accent/10 hover:bg-accent/20',
+    description: 'Report safety concerns or harassment',
+    icon: ShieldCheck,
+    bgClass: 'bg-white border-gray-200 hover:border-purple-300',
+    iconBgClass: 'bg-purple-500',
   },
 ];
 
@@ -112,64 +112,62 @@ export default function Emergency() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <PageHeader 
         title="Emergency" 
-        subtitle="Report emergencies and get help"
+        subtitle="Report emergencies and get immediate help"
+        icon={AlertTriangle}
+        iconColorClass="bg-red-100 text-red-500"
       />
 
-      <main className="px-4 -mt-4 pb-8 safe-bottom">
-        <div className="container max-w-lg mx-auto">
+      <main className="px-6 pb-8">
+        <div className="container max-w-4xl mx-auto">
           {/* Success State */}
           {isSuccess ? (
-            <div className="card-elevated p-8 text-center animate-scale-in">
-              <div className="w-20 h-20 rounded-full bg-success/10 mx-auto mb-4 flex items-center justify-center">
-                <CheckCircle2 className="w-10 h-10 text-success" />
+            <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
+              <div className="w-20 h-20 rounded-full bg-green-100 mx-auto mb-4 flex items-center justify-center">
+                <CheckCircle2 className="w-10 h-10 text-green-600" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-2">Emergency Reported</h3>
               <p className="text-muted-foreground">
                 Your emergency has been reported successfully. The transport team has been notified and help is on the way.
               </p>
-              <div className="mt-4 p-3 bg-success/10 rounded-lg text-sm text-success font-medium">
+              <div className="mt-4 p-3 bg-green-50 rounded-lg text-sm text-green-700 font-medium">
                 Reference: EMG-{Date.now().toString().slice(-6)}
               </div>
             </div>
           ) : (
             <>
               {/* Warning Banner */}
-              <div className="card-elevated p-4 mb-4 bg-emergency/5 border-emergency/20 animate-fade-in">
-                <div className="flex items-start gap-3">
-                  <AlertTriangle className="w-6 h-6 text-emergency shrink-0 mt-0.5" />
-                  <div>
-                    <h4 className="font-semibold text-foreground">Report Emergencies Only</h4>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      This feature is for genuine emergencies only. False reports may result in disciplinary action.
-                    </p>
-                  </div>
+              <div className="bg-red-50 border border-red-100 rounded-2xl p-4 mb-6">
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />
+                  <p className="text-red-600 text-sm font-medium">
+                    Use only in genuine emergencies. False reports may be penalized.
+                  </p>
                 </div>
               </div>
 
               {/* Emergency Options */}
-              <div className="grid grid-cols-2 gap-3">
-                {emergencyTypes.map((emergency, index) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {emergencyTypes.map((emergency) => (
                   <button
                     key={emergency.id}
                     onClick={() => handleEmergencySelect(emergency)}
-                    className={`card-elevated p-4 text-left transition-all animate-fade-in ${emergency.bgClass}`}
-                    style={{ animationDelay: `${0.1 * index}s` }}
+                    className={`rounded-2xl border-2 p-6 text-center transition-all ${emergency.bgClass}`}
                   >
-                    <div className={`w-14 h-14 rounded-2xl ${emergency.bgClass} flex items-center justify-center mb-3`}>
-                      <emergency.icon className={`w-7 h-7 ${emergency.colorClass}`} />
+                    <div className={`w-16 h-16 rounded-2xl ${emergency.iconBgClass} flex items-center justify-center mx-auto mb-4`}>
+                      <emergency.icon className="w-8 h-8 text-white" />
                     </div>
-                    <h4 className="font-semibold text-foreground">{emergency.title}</h4>
-                    <p className="text-xs text-muted-foreground mt-1">{emergency.description}</p>
+                    <h4 className="font-semibold text-foreground text-lg">{emergency.title}</h4>
+                    <p className="text-sm text-muted-foreground mt-1">{emergency.description}</p>
                   </button>
                 ))}
               </div>
 
               {/* Emergency Contact */}
-              <div className="card-elevated p-4 mt-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                <h4 className="font-semibold text-foreground mb-2">Emergency Contacts</h4>
+              <div className="bg-white rounded-2xl border border-gray-100 p-6 mt-6">
+                <h4 className="font-semibold text-foreground mb-3">Emergency Contacts</h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Transport Office:</span>
@@ -181,7 +179,7 @@ export default function Emergency() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Medical:</span>
-                    <a href="tel:108" className="font-medium text-emergency">108</a>
+                    <a href="tel:108" className="font-medium text-red-500">108</a>
                   </div>
                 </div>
               </div>
@@ -196,7 +194,9 @@ export default function Emergency() {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               {selectedEmergency && (
-                <selectedEmergency.icon className={`w-5 h-5 ${selectedEmergency.colorClass}`} />
+                <div className={`w-8 h-8 rounded-lg ${selectedEmergency.iconBgClass} flex items-center justify-center`}>
+                  <selectedEmergency.icon className="w-4 h-4 text-white" />
+                </div>
               )}
               Report {selectedEmergency?.title}?
             </AlertDialogTitle>
@@ -219,7 +219,7 @@ export default function Emergency() {
             <AlertDialogAction
               onClick={handleSubmitEmergency}
               disabled={isSubmitting}
-              className="gradient-emergency text-emergency-foreground"
+              className="bg-red-500 hover:bg-red-600 text-white"
             >
               {isSubmitting ? 'Reporting...' : 'Report Emergency'}
             </AlertDialogAction>

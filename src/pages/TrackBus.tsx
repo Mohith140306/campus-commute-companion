@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { mockBuses, getStatusColor, getStatusText, type Bus } from '@/lib/mockData';
 import { useFavourites } from '@/hooks/useFavourites';
-import { Search, Clock, Navigation, Phone, Users, Star } from 'lucide-react';
+import { Bus as BusIcon, Clock, Navigation, Phone, Users, Star } from 'lucide-react';
 
 export default function TrackBus() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -35,50 +35,61 @@ export default function TrackBus() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <PageHeader 
         title="Track Bus" 
-        subtitle="Search and track any college bus"
+        subtitle="Enter bus number to track location"
+        icon={BusIcon}
+        iconColorClass="bg-amber-500 text-white"
       />
 
-      <main className="px-4 -mt-4 pb-8 safe-bottom">
-        <div className="container max-w-lg mx-auto space-y-4">
+      <main className="px-6 pb-8">
+        <div className="container max-w-4xl mx-auto space-y-4">
           {/* Search Section */}
-          <div className="card-elevated p-4 animate-fade-in">
-            <div className="space-y-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+            <div className="space-y-4">
+              <div>
+                <label className="block font-medium text-foreground mb-2">Search Bus Number</label>
                 <Input
-                  placeholder="Search by bus number or route..."
+                  placeholder="e.g., CB-101"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="h-12"
                 />
               </div>
 
-              <Select value={selectedBusId} onValueChange={handleSelectBus}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a bus" />
-                </SelectTrigger>
-                <SelectContent>
-                  {filteredBuses.map(bus => (
-                    <SelectItem key={bus.id} value={bus.id}>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{bus.busNumber}</span>
-                        <span className="text-muted-foreground">-</span>
-                        <span className="text-sm text-muted-foreground">{bus.routeName}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px bg-gray-200" />
+                <span className="text-sm text-primary font-medium tracking-wide">OR SELECT FROM LIST</span>
+                <div className="flex-1 h-px bg-gray-200" />
+              </div>
+
+              <div>
+                <label className="block font-medium text-foreground mb-2">Select Bus</label>
+                <Select value={selectedBusId} onValueChange={handleSelectBus}>
+                  <SelectTrigger className="h-12">
+                    <SelectValue placeholder="Choose a bus" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredBuses.map(bus => (
+                      <SelectItem key={bus.id} value={bus.id}>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{bus.busNumber}</span>
+                          <span className="text-muted-foreground">-</span>
+                          <span className="text-sm text-muted-foreground">{bus.routeName}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
               <Button 
                 onClick={handleTrackBus} 
-                className="w-full gradient-primary text-primary-foreground"
+                className="w-full h-12 bg-[hsl(190,55%,55%)] hover:bg-[hsl(190,55%,50%)] text-white text-base font-medium"
                 disabled={!selectedBusId}
               >
-                <Navigation className="w-4 h-4 mr-2" />
+                <Navigation className="w-5 h-5 mr-2" />
                 Track Bus
               </Button>
             </div>
@@ -86,21 +97,21 @@ export default function TrackBus() {
 
           {/* Bus Details */}
           {trackedBus && (
-            <div className="space-y-4 animate-fade-in">
+            <div className="space-y-4">
               {/* Status Card */}
-              <div className="card-elevated p-4">
+              <div className="bg-white rounded-2xl border border-gray-100 p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <div className="flex items-center gap-2">
                       <h2 className="text-xl font-bold text-foreground">{trackedBus.busNumber}</h2>
                       <button
                         onClick={() => toggleFavourite(trackedBus.busNumber)}
-                        className="p-1.5 rounded-full hover:bg-secondary transition-colors"
+                        className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
                       >
                         <Star 
                           className={`w-5 h-5 ${
                             isFavourite(trackedBus.busNumber) 
-                              ? 'fill-warning text-warning' 
+                              ? 'fill-amber-500 text-amber-500' 
                               : 'text-muted-foreground'
                           }`} 
                         />
@@ -108,24 +119,24 @@ export default function TrackBus() {
                     </div>
                     <p className="text-muted-foreground text-sm">{trackedBus.routeName}</p>
                   </div>
-                  <div className={`px-3 py-1.5 rounded-full text-sm font-medium text-primary-foreground ${getStatusColor(trackedBus.status)}`}>
+                  <div className={`px-3 py-1.5 rounded-full text-sm font-medium text-white ${getStatusColor(trackedBus.status)}`}>
                     {getStatusText(trackedBus.status)}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3 p-3 bg-secondary/50 rounded-xl">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Clock className="w-5 h-5 text-primary" />
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                      <Clock className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
                       <div className="text-xs text-muted-foreground">ETA</div>
                       <div className="font-semibold text-foreground">{trackedBus.eta}</div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-3 bg-secondary/50 rounded-xl">
-                    <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center">
-                      <Navigation className="w-5 h-5 text-success" />
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                      <Navigation className="w-5 h-5 text-green-600" />
                     </div>
                     <div>
                       <div className="text-xs text-muted-foreground">Speed</div>
@@ -136,17 +147,17 @@ export default function TrackBus() {
               </div>
 
               {/* Map */}
-              <div className="card-elevated p-4">
+              <div className="bg-white rounded-2xl border border-gray-100 p-6">
                 <h3 className="font-semibold text-foreground mb-3">Live Location</h3>
                 <BusMap bus={trackedBus} />
               </div>
 
               {/* Driver Info */}
-              <div className="card-elevated p-4">
+              <div className="bg-white rounded-2xl border border-gray-100 p-6">
                 <h3 className="font-semibold text-foreground mb-3">Driver Information</h3>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full gradient-primary flex items-center justify-center text-primary-foreground font-bold text-lg">
+                    <div className="w-12 h-12 rounded-full bg-[hsl(195,72%,35%)] flex items-center justify-center text-white font-bold text-lg">
                       {trackedBus.driverName.charAt(0)}
                     </div>
                     <div>
@@ -159,7 +170,7 @@ export default function TrackBus() {
                   </div>
                   <a
                     href={`tel:${trackedBus.driverPhone}`}
-                    className="p-3 rounded-full bg-success text-success-foreground hover:opacity-90 transition-opacity"
+                    className="p-3 rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors"
                   >
                     <Phone className="w-5 h-5" />
                   </a>
@@ -170,8 +181,8 @@ export default function TrackBus() {
 
           {/* Empty State */}
           {!trackedBus && (
-            <div className="card-elevated p-8 text-center animate-fade-in">
-              <div className="w-16 h-16 rounded-full bg-secondary mx-auto mb-4 flex items-center justify-center">
+            <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
+              <div className="w-16 h-16 rounded-full bg-gray-100 mx-auto mb-4 flex items-center justify-center">
                 <Navigation className="w-8 h-8 text-muted-foreground" />
               </div>
               <h3 className="font-semibold text-foreground mb-2">Select a Bus to Track</h3>

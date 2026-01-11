@@ -1,119 +1,70 @@
-import { Bus, MapPin, Star, AlertTriangle, MessageSquare } from 'lucide-react';
+import { Search, MapPin, Star, AlertTriangle, MessageSquare } from 'lucide-react';
 import { FeatureCard } from '@/components/FeatureCard';
+import { AppHeader } from '@/components/AppHeader';
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero Header */}
-      <header className="gradient-hero text-primary-foreground px-4 pt-8 pb-12 safe-top relative overflow-hidden">
-        {/* Background decorative elements */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 right-10 w-32 h-32 rounded-full bg-primary-foreground/20 blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-primary-foreground/10 blur-3xl" />
-        </div>
-        
-        <div className="container max-w-lg mx-auto relative">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center animate-fade-in">
-              <Bus className="w-8 h-8" />
-            </div>
-            <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              <h1 className="text-2xl font-bold tracking-tight">College Bus Tracker</h1>
-              <p className="text-primary-foreground/70 text-sm mt-0.5">
-                Live bus tracking & alerts for students
-              </p>
-            </div>
-          </div>
-          
-          {/* Quick Stats */}
-          <div className="grid grid-cols-3 gap-3 mt-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            <div className="bg-primary-foreground/10 backdrop-blur-sm rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold">8</div>
-              <div className="text-xs text-primary-foreground/70">Active Buses</div>
-            </div>
-            <div className="bg-primary-foreground/10 backdrop-blur-sm rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold">6</div>
-              <div className="text-xs text-primary-foreground/70">On Route</div>
-            </div>
-            <div className="bg-primary-foreground/10 backdrop-blur-sm rounded-xl p-3 text-center">
-              <div className="text-2xl font-bold">12</div>
-              <div className="text-xs text-primary-foreground/70">Routes</div>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gray-50">
+      <AppHeader />
 
-      {/* Main Content */}
-      <main className="px-4 -mt-4 pb-8 safe-bottom">
-        <div className="container max-w-lg mx-auto space-y-3">
-          {/* Feature Cards */}
-          <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
+      {/* Welcome Section */}
+      <div className="bg-background px-6 py-6">
+        <div className="container max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-foreground">
+            Welcome, Student! <span className="inline-block animate-wave">👋</span>
+          </h2>
+          <p className="text-muted-foreground mt-1">Track your college bus in real-time</p>
+        </div>
+      </div>
+
+      {/* Feature Cards Grid */}
+      <main className="px-6 pb-8">
+        <div className="container max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FeatureCard
               title="Track Bus by Number"
-              description="Search and track any college bus in real-time"
-              icon={Bus}
-              iconBgClass="gradient-primary"
+              description="Enter bus number to see live location and ETA"
+              icon={Search}
+              iconBgClass="bg-blue-100"
+              iconColorClass="text-blue-600"
               to="/track"
             />
-          </div>
 
-          <div className="animate-fade-in" style={{ animationDelay: '0.35s' }}>
             <FeatureCard
               title="Nearby Buses"
-              description="Find buses closest to your current location"
+              description="Find buses close to your current location"
               icon={MapPin}
-              iconBgClass="gradient-success"
+              iconBgClass="bg-green-100"
+              iconColorClass="text-green-600"
               to="/nearby"
             />
-          </div>
 
-          <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
             <FeatureCard
               title="My Favourites"
               description="Quick access to your saved bus routes"
               icon={Star}
-              iconBgClass="bg-warning"
+              iconBgClass="bg-amber-100"
+              iconColorClass="text-amber-600"
               to="/favourites"
             />
-          </div>
 
-          <div className="animate-fade-in" style={{ animationDelay: '0.45s' }}>
             <FeatureCard
               title="Emergency"
               description="Report emergencies and get immediate help"
               icon={AlertTriangle}
-              iconBgClass="gradient-emergency"
+              iconBgClass="bg-red-100"
+              iconColorClass="text-red-500"
               to="/emergency"
-              badge="SOS"
-              badgeClass="bg-emergency text-emergency-foreground"
             />
-          </div>
 
-          <div className="animate-fade-in" style={{ animationDelay: '0.5s' }}>
             <FeatureCard
               title="Feedback"
               description="Share your suggestions and report issues"
               icon={MessageSquare}
-              iconBgClass="gradient-accent"
+              iconBgClass="bg-blue-100"
+              iconColorClass="text-blue-600"
               to="/feedback"
             />
-          </div>
-
-          {/* Help Card */}
-          <div className="mt-6 animate-fade-in" style={{ animationDelay: '0.55s' }}>
-            <div className="card-elevated p-4 bg-secondary/50">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                  <Bus className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <h4 className="font-medium text-foreground">Need Help?</h4>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Contact the transport office at <span className="font-medium text-primary">+91 80-1234-5678</span> for any queries.
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </main>
