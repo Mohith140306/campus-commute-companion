@@ -14,10 +14,11 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Wrench, Car, Heart, ShieldCheck, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useCreateEmergencyReport } from '@/hooks/useEmergencyReports';
 
 interface EmergencyType {
   id: string;
-  type: 'breakdown' | 'accident' | 'medical' | 'women_safety';
+  type: 'breakdown' | 'accident' | 'medical' | 'safety';
   title: string;
   description: string;
   icon: typeof Wrench;
@@ -55,7 +56,7 @@ const emergencyTypes: EmergencyType[] = [
   },
   {
     id: '4',
-    type: 'women_safety',
+    type: 'safety',
     title: 'Women Safety',
     description: 'Report safety concerns or harassment',
     icon: ShieldCheck,
@@ -68,8 +69,10 @@ export default function Emergency() {
   const [selectedEmergency, setSelectedEmergency] = useState<EmergencyType | null>(null);
   const [message, setMessage] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [referenceId, setReferenceId] = useState('');
+
+  const createEmergencyReport = useCreateEmergencyReport();
 
   const handleEmergencySelect = (emergency: EmergencyType) => {
     setSelectedEmergency(emergency);
@@ -79,36 +82,32 @@ export default function Emergency() {
   const handleSubmitEmergency = async () => {
     if (!selectedEmergency) return;
 
-    setIsSubmitting(true);
+    try {
+      const result = await createEmergencyReport.mutateAsync({
+        emergency_type: selectedEmergency.type,
+        message: message || undefined,
+      });
 
-    // Simulate API call - will be replaced with Supabase
-    await new Promise(resolve => setTimeout(resolve, 1500));
+      setReferenceId(result.reference_id);
+      setIsDialogOpen(false);
+      setIsSuccess(true);
+      setMessage('');
 
-    // Mock saving to backend
-    const emergencyReport = {
-      id: Date.now().toString(),
-      type: selectedEmergency.type,
-      message: message || undefined,
-      createdAt: new Date().toISOString(),
-      status: 'pending',
-    };
+      toast.success('Emergency reported successfully!', {
+        description: 'Help is on the way. Stay calm.',
+      });
 
-    console.log('Emergency Report:', emergencyReport);
-
-    setIsSubmitting(false);
-    setIsDialogOpen(false);
-    setIsSuccess(true);
-    setMessage('');
-
-    toast.success('Emergency reported successfully!', {
-      description: 'Help is on the way. Stay calm.',
-    });
-
-    // Reset success state after 3 seconds
-    setTimeout(() => {
-      setIsSuccess(false);
-      setSelectedEmergency(null);
-    }, 3000);
+      // Reset success state after 5 seconds
+      setTimeout(() => {
+        setIsSuccess(false);
+        setSelectedEmergency(null);
+        setReferenceId('');
+      }, 5000);
+    } catch (error) {
+      toast.error('Failed to report emergency', {
+        description: 'Please try again or call emergency contacts directly.',
+      });
+    }
   };
 
   return (
@@ -133,7 +132,7 @@ export default function Emergency() {
                 Your emergency has been reported successfully. The transport team has been notified and help is on the way.
               </p>
               <div className="mt-4 p-3 bg-green-50 rounded-lg text-sm text-green-700 font-medium">
-                Reference: EMG-{Date.now().toString().slice(-6)}
+                Reference: {referenceId}
               </div>
             </div>
           ) : (
@@ -215,13 +214,13 @@ export default function Emergency() {
           </div>
 
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={createEmergencyReport.isPending}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleSubmitEmergency}
-              disabled={isSubmitting}
+              disabled={createEmergencyReport.isPending}
               className="bg-red-500 hover:bg-red-600 text-white"
             >
-              {isSubmitting ? 'Reporting...' : 'Report Emergency'}
+              {createEmergencyReport.isPending ? 'Reporting...' : 'Report Emergency'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

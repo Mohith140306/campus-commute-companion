@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { MessageSquare, Send, CheckCircle2, Bus, User, Smartphone, Shield } from 'lucide-react';
 import { toast } from 'sonner';
+import { useCreateFeedback } from '@/hooks/useFeedback';
 
 interface FeedbackCategory {
   id: string;
@@ -50,10 +51,11 @@ const feedbackCategories: FeedbackCategory[] = [
 ];
 
 export default function Feedback() {
-  const [category, setCategory] = useState<string>('');
+  const [category, setCategory] = useState<'bus' | 'driver' | 'app' | 'safety' | ''>('');
   const [message, setMessage] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  const createFeedback = useCreateFeedback();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,34 +65,28 @@ export default function Feedback() {
       return;
     }
 
-    setIsSubmitting(true);
+    try {
+      await createFeedback.mutateAsync({
+        category: category as 'bus' | 'driver' | 'app' | 'safety',
+        message: message.trim(),
+      });
 
-    // Simulate API call - will be replaced with Supabase
-    await new Promise(resolve => setTimeout(resolve, 1500));
+      setIsSuccess(true);
+      toast.success('Feedback submitted successfully!', {
+        description: 'Thank you for your feedback.',
+      });
 
-    // Mock saving to backend
-    const feedback = {
-      id: Date.now().toString(),
-      category,
-      message: message.trim(),
-      createdAt: new Date().toISOString(),
-    };
-
-    console.log('Feedback:', feedback);
-
-    setIsSubmitting(false);
-    setIsSuccess(true);
-
-    toast.success('Feedback submitted successfully!', {
-      description: 'Thank you for your feedback.',
-    });
-
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setIsSuccess(false);
-      setCategory('');
-      setMessage('');
-    }, 3000);
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setIsSuccess(false);
+        setCategory('');
+        setMessage('');
+      }, 3000);
+    } catch (error) {
+      toast.error('Failed to submit feedback', {
+        description: 'Please try again.',
+      });
+    }
   };
 
   return (
@@ -164,10 +160,10 @@ export default function Feedback() {
               {/* Submit Button */}
               <Button
                 type="submit"
-                disabled={isSubmitting || !category || !message.trim()}
+                disabled={createFeedback.isPending || !category || !message.trim()}
                 className="w-full h-12 bg-[hsl(190,55%,55%)] hover:bg-[hsl(190,55%,50%)] text-white text-base font-medium"
               >
-                {isSubmitting ? (
+                {createFeedback.isPending ? (
                   'Submitting...'
                 ) : (
                   <>

@@ -14,7 +14,102 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      buses: {
+        Row: {
+          bus_number: string
+          created_at: string
+          current_lat: number | null
+          current_lng: number | null
+          driver_name: string | null
+          eta: string | null
+          id: string
+          last_updated: string | null
+          route_name: string
+          speed: number | null
+          status: string
+        }
+        Insert: {
+          bus_number: string
+          created_at?: string
+          current_lat?: number | null
+          current_lng?: number | null
+          driver_name?: string | null
+          eta?: string | null
+          id?: string
+          last_updated?: string | null
+          route_name: string
+          speed?: number | null
+          status?: string
+        }
+        Update: {
+          bus_number?: string
+          created_at?: string
+          current_lat?: number | null
+          current_lng?: number | null
+          driver_name?: string | null
+          eta?: string | null
+          id?: string
+          last_updated?: string | null
+          route_name?: string
+          speed?: number | null
+          status?: string
+        }
+        Relationships: []
+      }
+      emergency_reports: {
+        Row: {
+          created_at: string
+          emergency_type: string
+          id: string
+          message: string | null
+          reference_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          emergency_type: string
+          id?: string
+          message?: string | null
+          reference_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          emergency_type?: string
+          id?: string
+          message?: string | null
+          reference_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      feedback: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          message: string
+          status: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          message: string
+          status?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          message?: string
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
