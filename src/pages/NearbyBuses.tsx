@@ -69,24 +69,6 @@ export default function NearbyBuses() {
     navigate(`/track?bus=${busId}`);
   };
 
-  // Convert Bus to the format BusMap expects
-  const mapBus = selectedBus ? {
-    id: selectedBus.id,
-    busNumber: selectedBus.bus_number,
-    routeName: selectedBus.route_name,
-    driverName: selectedBus.driver_name || 'Unknown',
-    driverPhone: '',
-    capacity: 45,
-    status: selectedBus.status === 'active' ? 'running' as const : 
-            selectedBus.status === 'delayed' ? 'delayed' as const : 'maintenance' as const,
-    currentLocation: {
-      lat: selectedBus.current_lat || 12.9716,
-      lng: selectedBus.current_lng || 77.5946,
-    },
-    lastUpdated: selectedBus.last_updated || new Date().toISOString(),
-    eta: selectedBus.eta || 'N/A',
-    speed: selectedBus.speed || 0,
-  } : undefined;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -148,7 +130,7 @@ export default function NearbyBuses() {
                 {selectedBus ? `Tracking ${selectedBus.bus_number}` : 'Your Location'}
               </h3>
               <BusMap 
-                bus={mapBus}
+                bus={selectedBus || undefined}
                 studentLocation={{ lat: latitude, lng: longitude }}
               />
             </div>
