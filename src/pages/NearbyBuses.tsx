@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '@/components/PageHeader';
 import { BusMap } from '@/components/BusMap';
 import { Button } from '@/components/ui/button';
-import { mockBuses, calculateDistance, formatDistance, getStatusColor, getStatusText, type Bus } from '@/lib/mockData';
+import { useBuses, getStatusColor, getStatusText, type Bus } from '@/hooks/useBuses';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useFavourites } from '@/hooks/useFavourites';
 import { MapPin, Navigation, Loader2, Star, Clock, Bus as BusIcon } from 'lucide-react';
@@ -12,32 +12,54 @@ interface BusWithDistance extends Bus {
   distance: number;
 }
 
+// Calculate distance between two coordinates (Haversine formula)
+function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371; // Earth's radius in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+    Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLng / 2) *
+    Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+// Format distance for display
+function formatDistance(km: number): string {
+  if (km < 1) {
+    return `${Math.round(km * 1000)} m`;
+  }
+  return `${km.toFixed(1)} km`;
+}
+
 export default function NearbyBuses() {
   const navigate = useNavigate();
   const { latitude, longitude, error, loading, getLocation } = useGeolocation();
   const { isFavourite, toggleFavourite } = useFavourites();
-  const [nearbyBuses, setNearbyBuses] = useState<BusWithDistance[]>([]);
   const [selectedBus, setSelectedBus] = useState<Bus | null>(null);
 
-  // Calculate nearby buses when location is available
-  useEffect(() => {
-    if (latitude && longitude) {
-      const busesWithDistance = mockBuses
-        .filter(bus => bus.status !== 'maintenance')
-        .map(bus => ({
-          ...bus,
-          distance: calculateDistance(
-            latitude,
-            longitude,
-            bus.currentLocation.lat,
-            bus.currentLocation.lng
-          ),
-        }))
-        .sort((a, b) => a.distance - b.distance);
+  const { data: buses, isLoading: busesLoading } = useBuses();
 
-      setNearbyBuses(busesWithDistance);
-    }
-  }, [latitude, longitude]);
+  // Calculate nearby buses when location is available
+  const nearbyBuses = useMemo(() => {
+    if (!latitude || !longitude || !buses) return [];
+    
+    return buses
+      .filter(bus => bus.status !== 'maintenance' && bus.current_lat && bus.current_lng)
+      .map(bus => ({
+        ...bus,
+        distance: calculateDistance(
+          latitude,
+          longitude,
+          bus.current_lat!,
+          bus.current_lng!
+        ),
+      }))
+      .sort((a, b) => a.distance - b.distance) as BusWithDistance[];
+  }, [latitude, longitude, buses]);
 
   const handleSelectBus = (bus: Bus) => {
     setSelectedBus(bus);
@@ -46,6 +68,25 @@ export default function NearbyBuses() {
   const handleTrackBus = (busId: string) => {
     navigate(`/track?bus=${busId}`);
   };
+
+  // Convert Bus to the format BusMap expects
+  const mapBus = selectedBus ? {
+    id: selectedBus.id,
+    busNumber: selectedBus.bus_number,
+    routeName: selectedBus.route_name,
+    driverName: selectedBus.driver_name || 'Unknown',
+    driverPhone: '',
+    capacity: 45,
+    status: selectedBus.status === 'active' ? 'running' as const : 
+            selectedBus.status === 'delayed' ? 'delayed' as const : 'maintenance' as const,
+    currentLocation: {
+      lat: selectedBus.current_lat || 12.9716,
+      lng: selectedBus.current_lng || 77.5946,
+    },
+    lastUpdated: selectedBus.last_updated || new Date().toISOString(),
+    eta: selectedBus.eta || 'N/A',
+    speed: selectedBus.speed || 0,
+  } : undefined;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -92,14 +133,22 @@ export default function NearbyBuses() {
             )}
           </div>
 
+          {/* Loading state for buses */}
+          {busesLoading && (
+            <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
+              <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" />
+              <p className="mt-2 text-sm text-muted-foreground">Loading buses...</p>
+            </div>
+          )}
+
           {/* Map with selected bus */}
-          {latitude && longitude && (
+          {latitude && longitude && !busesLoading && (
             <div className="bg-white rounded-2xl border border-gray-100 p-6">
               <h3 className="font-semibold text-foreground mb-3">
-                {selectedBus ? `Tracking ${selectedBus.busNumber}` : 'Your Location'}
+                {selectedBus ? `Tracking ${selectedBus.bus_number}` : 'Your Location'}
               </h3>
               <BusMap 
-                bus={selectedBus || undefined}
+                bus={mapBus}
                 studentLocation={{ lat: latitude, lng: longitude }}
               />
             </div>
@@ -124,24 +173,24 @@ export default function NearbyBuses() {
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h4 className="font-semibold text-foreground">{bus.busNumber}</h4>
+                          <h4 className="font-semibold text-foreground">{bus.bus_number}</h4>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              toggleFavourite(bus.busNumber);
+                              toggleFavourite(bus.bus_number);
                             }}
                             className="p-1 rounded-full hover:bg-gray-100 transition-colors"
                           >
                             <Star 
                               className={`w-4 h-4 ${
-                                isFavourite(bus.busNumber) 
+                                isFavourite(bus.bus_number) 
                                   ? 'fill-amber-500 text-amber-500' 
                                   : 'text-muted-foreground'
                               }`} 
                             />
                           </button>
                         </div>
-                        <p className="text-sm text-muted-foreground">{bus.routeName}</p>
+                        <p className="text-sm text-muted-foreground">{bus.route_name}</p>
                         <div className="flex items-center gap-3 mt-2">
                           <span className="flex items-center gap-1 text-xs text-muted-foreground">
                             <MapPin className="w-3 h-3" />
@@ -149,7 +198,7 @@ export default function NearbyBuses() {
                           </span>
                           <span className="flex items-center gap-1 text-xs text-muted-foreground">
                             <Clock className="w-3 h-3" />
-                            {bus.eta}
+                            {bus.eta || 'N/A'}
                           </span>
                         </div>
                       </div>
