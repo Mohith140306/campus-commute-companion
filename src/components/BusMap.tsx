@@ -1,22 +1,25 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Bus as BusType } from '@/lib/mockData';
+import { Bus } from '@/hooks/useBuses';
+
+type BusStatus = 'active' | 'delayed' | 'maintenance';
 
 // Fix for default marker icons in Leaflet with bundlers
-const createBusIcon = (status: BusType['status']) => {
-  const colors: Record<BusType['status'], string> = {
-    running: '#22c55e',
-    stopped: '#eab308',
+const createBusIcon = (status: BusStatus) => {
+  const colors: Record<BusStatus, string> = {
+    active: '#22c55e',
     delayed: '#f97316',
     maintenance: '#6b7280',
   };
+
+  const color = colors[status] || '#6b7280';
 
   return L.divIcon({
     className: 'custom-bus-marker',
     html: `
       <div style="
-        background: ${colors[status]};
+        background: ${color};
         width: 40px;
         height: 40px;
         border-radius: 50%;
@@ -45,7 +48,7 @@ const createBusIcon = (status: BusType['status']) => {
         height: 0;
         border-left: 8px solid transparent;
         border-right: 8px solid transparent;
-        border-top: 10px solid ${colors[status]};
+        border-top: 10px solid ${color};
       "></div>
     `,
     iconSize: [40, 50],
@@ -93,7 +96,7 @@ const createStudentIcon = () => {
 };
 
 interface BusMapProps {
-  bus?: BusType;
+  bus?: Bus;
   studentLocation?: { lat: number; lng: number } | null;
   className?: string;
 }
@@ -150,25 +153,23 @@ export function BusMap({ bus, studentLocation, className = '' }: BusMapProps) {
       bounds.push([studentLocation.lat, studentLocation.lng]);
     }
 
-    // Add bus marker if available
-    if (bus) {
+    // Add bus marker if available and has location
+    if (bus && bus.current_lat !== null && bus.current_lng !== null) {
       const busMarker = L.marker(
-        [bus.currentLocation.lat, bus.currentLocation.lng],
+        [bus.current_lat, bus.current_lng],
         { icon: createBusIcon(bus.status) }
       )
         .addTo(mapInstanceRef.current)
         .bindPopup(`
           <div style="min-width: 150px;">
-            <strong style="font-size: 14px;">${bus.busNumber}</strong>
-            <p style="margin: 4px 0 0; color: #666; font-size: 12px;">${bus.routeName}</p>
-            <p style="margin: 4px 0 0; font-size: 12px;">
-              <strong>ETA:</strong> ${bus.eta}
-            </p>
+            <strong style="font-size: 14px;">${bus.bus_number}</strong>
+            <p style="margin: 4px 0 0; color: #666; font-size: 12px;">${bus.route_name}</p>
+            ${bus.eta ? `<p style="margin: 4px 0 0; font-size: 12px;"><strong>ETA:</strong> ${bus.eta}</p>` : ''}
           </div>
         `);
       
       markersRef.current.push(busMarker);
-      bounds.push([bus.currentLocation.lat, bus.currentLocation.lng]);
+      bounds.push([bus.current_lat, bus.current_lng]);
     }
 
     // Fit map to show all markers
@@ -191,3 +192,5 @@ export function BusMap({ bus, studentLocation, className = '' }: BusMapProps) {
     />
   );
 }
+
+export default BusMap;

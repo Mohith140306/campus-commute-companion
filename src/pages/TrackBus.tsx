@@ -45,24 +45,6 @@ export default function TrackBus() {
     }
   };
 
-  // Convert Bus to the format BusMap expects
-  const mapBus = trackedBus ? {
-    id: trackedBus.id,
-    busNumber: trackedBus.bus_number,
-    routeName: trackedBus.route_name,
-    driverName: trackedBus.driver_name || 'Unknown',
-    driverPhone: '',
-    capacity: 45,
-    status: trackedBus.status === 'active' ? 'running' as const : 
-            trackedBus.status === 'delayed' ? 'delayed' as const : 'maintenance' as const,
-    currentLocation: {
-      lat: trackedBus.current_lat || 12.9716,
-      lng: trackedBus.current_lng || 77.5946,
-    },
-    lastUpdated: trackedBus.last_updated || new Date().toISOString(),
-    eta: trackedBus.eta || 'N/A',
-    speed: trackedBus.speed || 0,
-  } : null;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -190,7 +172,7 @@ export default function TrackBus() {
               {/* Map */}
               <div className="bg-white rounded-2xl border border-gray-100 p-6">
                 <h3 className="font-semibold text-foreground mb-3">Live Location</h3>
-                {mapBus && <BusMap bus={mapBus} />}
+                {trackedBus && <BusMap bus={trackedBus} />}
               </div>
 
               {/* Driver Info */}

@@ -10,6 +10,7 @@ import Favourites from "./pages/Favourites";
 import Emergency from "./pages/Emergency";
 import Feedback from "./pages/Feedback";
 import DriverLogin from "./pages/DriverLogin";
+import DriverDashboard from "./pages/DriverDashboard";
 import AdminLogin from "./pages/AdminLogin";
 import NotFound from "./pages/NotFound";
 
@@ -30,8 +31,11 @@ const App = () => (
           <Route path="/emergency" element={<Emergency />} />
           <Route path="/feedback" element={<Feedback />} />
           
-          {/* Hidden Routes for Future Use */}
+          {/* Driver Routes */}
           <Route path="/driver/login" element={<DriverLogin />} />
+          <Route path="/driver/dashboard" element={<DriverDashboard />} />
+          
+          {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
           
           {/* Catch-all */}
