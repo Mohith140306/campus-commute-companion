@@ -12,10 +12,12 @@ import {
   Square,
   MapPin,
   Route,
-  Clock
+  Clock,
+  Gauge
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useDriverProfile, useUpdateBusLocation } from '@/hooks/useDriverProfile';
+import { useGpsTracking } from '@/hooks/useGpsTracking';
 import { useToast } from '@/hooks/use-toast';
 
 export default function DriverDashboard() {
@@ -28,6 +30,13 @@ export default function DriverDashboard() {
   const [isTripActive, setIsTripActive] = useState(false);
   const [isGpsSharing, setIsGpsSharing] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+
+  // Real GPS tracking hook - updates bus location every 5 seconds
+  const gpsTracking = useGpsTracking({
+    busId: driverProfile?.bus_id ?? null,
+    enabled: isGpsSharing && isTripActive,
+    intervalMs: 5000, // Update every 5 seconds
+  });
 
   // Redirect if not logged in
   useEffect(() => {
@@ -91,12 +100,14 @@ export default function DriverDashboard() {
       return;
     }
     
-    setIsGpsSharing(!isGpsSharing);
+    const newGpsState = !isGpsSharing;
+    setIsGpsSharing(newGpsState);
+    
     toast({
-      title: isGpsSharing ? "GPS Sharing Stopped" : "GPS Sharing Started",
-      description: isGpsSharing 
-        ? "Location sharing has been stopped." 
-        : "Your location will be shared with students.",
+      title: newGpsState ? "GPS Tracking Started" : "GPS Tracking Stopped",
+      description: newGpsState 
+        ? "Your live location will update every 5 seconds." 
+        : "Location sharing has been stopped.",
     });
   };
 
@@ -253,16 +264,54 @@ export default function DriverDashboard() {
             {/* GPS Status Indicator */}
             {isGpsSharing && (
               <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
-                <CardContent className="p-4">
+                <CardContent className="p-4 space-y-3">
                   <div className="flex items-center gap-3">
                     <div className="w-3 h-3 rounded-full bg-blue-500 animate-pulse" />
-                    <div>
+                    <div className="flex-1">
                       <p className="font-medium text-blue-700 dark:text-blue-300">GPS Active</p>
                       <p className="text-xs text-blue-600 dark:text-blue-400">
-                        Students can see your live location
+                        Updating every 5 seconds
                       </p>
                     </div>
                   </div>
+                  
+                  {/* Live GPS Data */}
+                  {gpsTracking.isTracking && (
+                    <div className="grid grid-cols-2 gap-3 pt-2 border-t border-blue-200 dark:border-blue-700">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-blue-500" />
+                        <div>
+                          <p className="text-[10px] text-blue-500 uppercase">Coordinates</p>
+                          <p className="text-xs font-mono text-blue-700 dark:text-blue-300">
+                            {gpsTracking.latitude?.toFixed(5) ?? '--'}, {gpsTracking.longitude?.toFixed(5) ?? '--'}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Gauge className="w-4 h-4 text-blue-500" />
+                        <div>
+                          <p className="text-[10px] text-blue-500 uppercase">Speed</p>
+                          <p className="text-xs font-mono text-blue-700 dark:text-blue-300">
+                            {gpsTracking.speed !== null ? `${gpsTracking.speed} km/h` : '-- km/h'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Last Updated */}
+                  {gpsTracking.lastUpdated && (
+                    <p className="text-[10px] text-blue-500 text-center">
+                      Last updated: {gpsTracking.lastUpdated.toLocaleTimeString()}
+                    </p>
+                  )}
+                  
+                  {/* Error Display */}
+                  {gpsTracking.error && (
+                    <p className="text-xs text-red-500 text-center">
+                      ⚠️ {gpsTracking.error}
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             )}
