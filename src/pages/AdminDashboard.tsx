@@ -16,12 +16,14 @@ import {
   Gauge,
   Clock,
   RefreshCw,
+  UserPlus,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useAllBuses, useAllEmergencyReports, useAllFeedback, useUpdateBusStatus } from '@/hooks/useAdminData';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import BusMap from '@/components/BusMap';
+import AddBusDriverForm from '@/components/admin/AddBusDriverForm';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -178,7 +180,7 @@ export default function AdminDashboard() {
 
         {/* Tabs: Buses / Emergencies / Feedback */}
         <Tabs defaultValue="buses">
-          <TabsList className="w-full grid grid-cols-3">
+          <TabsList className="w-full grid grid-cols-4">
             <TabsTrigger value="buses" className="gap-1">
               <Bus className="w-4 h-4" />
               Buses
@@ -190,6 +192,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="feedback" className="gap-1">
               <MessageSquare className="w-4 h-4" />
               Feedback
+            </TabsTrigger>
+            <TabsTrigger value="add" className="gap-1">
+              <UserPlus className="w-4 h-4" />
+              Add
             </TabsTrigger>
           </TabsList>
 
@@ -340,6 +346,10 @@ export default function AdminDashboard() {
                 </Card>
               ))
             )}
+          </TabsContent>
+          {/* ADD BUS & DRIVER TAB */}
+          <TabsContent value="add" className="mt-4">
+            <AddBusDriverForm />
           </TabsContent>
         </Tabs>
       </main>
