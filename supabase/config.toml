@@ -1,1 +1,4 @@
 project_id = "ezqgjcauznmqhdzrjolr"
+
+[functions.create-bus-driver]
+verify_jwt = false
