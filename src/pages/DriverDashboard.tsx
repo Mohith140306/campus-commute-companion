@@ -19,6 +19,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useDriverProfile, useUpdateBusLocation } from '@/hooks/useDriverProfile';
 import { useGpsTracking } from '@/hooks/useGpsTracking';
 import { useToast } from '@/hooks/use-toast';
+import { BusMap } from '@/components/BusMap';
 
 export default function DriverDashboard() {
   const navigate = useNavigate();
@@ -275,7 +276,6 @@ export default function DriverDashboard() {
                     </div>
                   </div>
                   
-                  {/* Live GPS Data */}
                   {gpsTracking.isTracking && (
                     <div className="grid grid-cols-2 gap-3 pt-2 border-t border-blue-200 dark:border-blue-700">
                       <div className="flex items-center gap-2">
@@ -299,17 +299,49 @@ export default function DriverDashboard() {
                     </div>
                   )}
                   
-                  {/* Last Updated */}
                   {gpsTracking.lastUpdated && (
                     <p className="text-[10px] text-blue-500 text-center">
                       Last updated: {gpsTracking.lastUpdated.toLocaleTimeString()}
                     </p>
                   )}
                   
-                  {/* Error Display */}
                   {gpsTracking.error && (
-                    <p className="text-xs text-red-500 text-center">
-                      ⚠️ {gpsTracking.error}
+                    <div className="text-xs text-center space-y-1">
+                      <p className="text-red-500">⚠️ {gpsTracking.error}</p>
+                      <p className="text-blue-500">GPS works on real devices. The preview iframe may block location access.</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Driver Location Map */}
+            {isTripActive && (
+              <Card>
+                <CardContent className="p-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-5 h-5 text-primary" />
+                    <p className="font-medium text-foreground">Your Location</p>
+                  </div>
+                  <BusMap
+                    bus={gpsTracking.latitude && gpsTracking.longitude ? {
+                      id: driverProfile.bus!.id,
+                      bus_number: driverProfile.bus!.bus_number,
+                      route_name: driverProfile.bus!.route_name,
+                      status: driverProfile.bus!.status as 'active' | 'delayed' | 'maintenance',
+                      current_lat: gpsTracking.latitude,
+                      current_lng: gpsTracking.longitude,
+                      speed: gpsTracking.speed,
+                      eta: null,
+                      driver_name: driverProfile.full_name,
+                      last_updated: gpsTracking.lastUpdated?.toISOString() ?? null,
+                      created_at: '',
+                    } : undefined}
+                    className="h-64 md:h-80"
+                  />
+                  {!gpsTracking.latitude && (
+                    <p className="text-xs text-muted-foreground text-center">
+                      Enable GPS sharing to see your location on the map
                     </p>
                   )}
                 </CardContent>

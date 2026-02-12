@@ -140,7 +140,7 @@ export function useGpsTracking({ busId, enabled, intervalMs = 5000 }: UseGpsTrac
     toast({
       variant: "destructive",
       title: "GPS Error",
-      description: errorMessage,
+      description: `${errorMessage} Note: GPS may not work in browser previews.`,
     });
   }, [toast]);
 
