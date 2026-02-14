@@ -116,7 +116,7 @@ export default function AddBusDriverForm() {
                   <p>Password: <strong>{created.password}</strong></p>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  The driver can now log in at /driver/login with these credentials.
+                  The driver can now log in at /driver with these credentials.
                 </p>
               </div>
             </div>
