@@ -39,13 +39,13 @@ export default function AdminDashboard() {
   // Auth & role check
   useEffect(() => {
     if (!authLoading && !user) {
-      navigate('/admin/login');
+      navigate('/admin');
       return;
     }
     if (user) {
       supabase.rpc('has_role', { _user_id: user.id, _role: 'admin' }).then(({ data }) => {
         if (!data) {
-          navigate('/admin/login');
+          navigate('/admin');
         } else {
           setIsAdmin(true);
         }
@@ -55,7 +55,7 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     await signOut();
-    navigate('/admin/login');
+    navigate('/admin');
   };
 
   const handleStatusChange = async (busId: string, newStatus: string) => {

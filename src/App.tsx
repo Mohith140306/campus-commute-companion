@@ -33,11 +33,11 @@ const App = () => (
           <Route path="/feedback" element={<Feedback />} />
           
           {/* Driver Routes */}
-          <Route path="/driver/login" element={<DriverLogin />} />
+          <Route path="/driver" element={<DriverLogin />} />
           <Route path="/driver/dashboard" element={<DriverDashboard />} />
           
           {/* Admin Routes */}
-          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           
           {/* Catch-all */}

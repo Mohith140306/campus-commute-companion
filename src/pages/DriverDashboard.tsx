@@ -42,7 +42,7 @@ export default function DriverDashboard() {
   // Redirect if not logged in
   useEffect(() => {
     if (!authLoading && !user) {
-      navigate('/driver/login');
+      navigate('/driver');
     }
   }, [user, authLoading, navigate]);
 
@@ -57,7 +57,7 @@ export default function DriverDashboard() {
 
   const handleLogout = async () => {
     await signOut();
-    navigate('/driver/login');
+    navigate('/driver');
   };
 
   const handleTripToggle = async () => {
