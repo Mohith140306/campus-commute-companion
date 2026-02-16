@@ -29,14 +29,12 @@ export default function DriverDashboard() {
   const { toast } = useToast();
   
   const [isTripActive, setIsTripActive] = useState(false);
-  const [isGpsSharing, setIsGpsSharing] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Real GPS tracking hook - updates bus location every 5 seconds
+  // Real GPS tracking - auto-starts when trip is active
   const gpsTracking = useGpsTracking({
     busId: driverProfile?.bus_id ?? null,
-    enabled: isGpsSharing && isTripActive,
-    intervalMs: 5000, // Update every 5 seconds
+    enabled: isTripActive,
   });
 
   // Redirect if not logged in
@@ -70,9 +68,8 @@ export default function DriverDashboard() {
       setIsTripActive(!isTripActive);
       
       if (isTripActive) {
-        setIsGpsSharing(false);
+        // GPS stops automatically since enabled is tied to isTripActive
       }
-      
       toast({
         title: isTripActive ? "Trip Ended" : "Trip Started",
         description: isTripActive 
@@ -91,26 +88,7 @@ export default function DriverDashboard() {
     }
   };
 
-  const handleGpsToggle = () => {
-    if (!isTripActive) {
-      toast({
-        variant: "destructive",
-        title: "Start Trip First",
-        description: "Please start your trip before sharing GPS.",
-      });
-      return;
-    }
-    
-    const newGpsState = !isGpsSharing;
-    setIsGpsSharing(newGpsState);
-    
-    toast({
-      title: newGpsState ? "GPS Tracking Started" : "GPS Tracking Stopped",
-      description: newGpsState 
-        ? "Your live location will update every 5 seconds." 
-        : "Location sharing has been stopped.",
-    });
-  };
+  // GPS status is now automatic - no separate toggle needed
 
   if (authLoading || profileLoading) {
     return (
@@ -231,39 +209,22 @@ export default function DriverDashboard() {
                 )}
               </Button>
 
-              {/* Share GPS Button */}
-              <Button 
-                variant={isGpsSharing ? "default" : "outline"}
-                className={`w-full h-14 text-base font-medium ${
-                  isGpsSharing 
-                    ? 'bg-blue-500 hover:bg-blue-600 text-white' 
-                    : ''
-                }`}
-                onClick={handleGpsToggle}
-                disabled={!isTripActive}
-              >
-                {isGpsSharing ? (
-                  <>
-                    <Navigation className="w-5 h-5 mr-2 animate-pulse" />
-                    GPS Sharing Active
-                  </>
-                ) : (
-                  <>
-                    <MapPin className="w-5 h-5 mr-2" />
-                    Share GPS Location
-                  </>
-                )}
-              </Button>
+              {isTripActive && (
+                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                  <Navigation className="w-4 h-4 animate-pulse text-primary" />
+                  GPS tracking is active automatically
+                </div>
+              )}
 
               {!isTripActive && (
                 <p className="text-xs text-muted-foreground text-center">
-                  Start your trip to enable GPS sharing
+                  Start your trip to enable GPS tracking
                 </p>
               )}
             </div>
 
             {/* GPS Status Indicator */}
-            {isGpsSharing && (
+            {isTripActive && (
               <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-center gap-3">
@@ -271,7 +232,7 @@ export default function DriverDashboard() {
                     <div className="flex-1">
                       <p className="font-medium text-blue-700 dark:text-blue-300">GPS Active</p>
                       <p className="text-xs text-blue-600 dark:text-blue-400">
-                        Updating every 5 seconds
+                        Updating continuously on movement
                       </p>
                     </div>
                   </div>
