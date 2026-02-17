@@ -13,6 +13,7 @@ import DriverLogin from "./pages/DriverLogin";
 import DriverDashboard from "./pages/DriverDashboard";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import Install from "./pages/Install";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/favourites" element={<Favourites />} />
           <Route path="/emergency" element={<Emergency />} />
           <Route path="/feedback" element={<Feedback />} />
+          <Route path="/install" element={<Install />} />
           
           {/* Driver Routes */}
           <Route path="/driver" element={<DriverLogin />} />

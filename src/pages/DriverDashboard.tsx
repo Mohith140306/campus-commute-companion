@@ -18,6 +18,7 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { useDriverProfile, useUpdateBusLocation } from '@/hooks/useDriverProfile';
 import { useGpsTracking } from '@/hooks/useGpsTracking';
+import { useWakeLock } from '@/hooks/useWakeLock';
 import { useToast } from '@/hooks/use-toast';
 import { BusMap } from '@/components/BusMap';
 
@@ -36,6 +37,9 @@ export default function DriverDashboard() {
     busId: driverProfile?.bus_id ?? null,
     enabled: isTripActive,
   });
+
+  // Keep screen awake during active trips
+  useWakeLock(isTripActive);
 
   // Redirect if not logged in
   useEffect(() => {
