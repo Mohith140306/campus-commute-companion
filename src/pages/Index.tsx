@@ -1,4 +1,5 @@
-import { Search, MapPin, Star, AlertTriangle, MessageSquare } from 'lucide-react';
+import { Search, MapPin, Star, AlertTriangle, MessageSquare, Bus, Shield } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { FeatureCard } from '@/components/FeatureCard';
 import { AppHeader } from '@/components/AppHeader';
 
@@ -68,6 +69,35 @@ const Index = () => {
           </div>
         </div>
       </main>
+
+      {/* Access Portal */}
+      <section className="px-6 pb-8">
+        <div className="container max-w-4xl mx-auto">
+          <div className="border border-border rounded-xl bg-card p-6 space-y-4">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider text-center">
+              Staff Access Portal
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                variant="outline"
+                className="h-14 flex items-center justify-center gap-2 text-sm font-medium"
+                onClick={() => window.location.href = '/driver'}
+              >
+                <Bus className="w-5 h-5 text-primary" />
+                Driver Login
+              </Button>
+              <Button
+                variant="outline"
+                className="h-14 flex items-center justify-center gap-2 text-sm font-medium"
+                onClick={() => window.location.href = '/admin'}
+              >
+                <Shield className="w-5 h-5 text-primary" />
+                Admin Login
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
