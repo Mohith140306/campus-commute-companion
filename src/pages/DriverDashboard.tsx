@@ -59,7 +59,7 @@ export default function DriverDashboard() {
 
   const handleLogout = async () => {
     await signOut();
-    navigate('/driver');
+    navigate('/');
   };
 
   const handleTripToggle = async () => {

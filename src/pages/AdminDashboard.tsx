@@ -55,7 +55,7 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     await signOut();
-    navigate('/admin');
+    navigate('/');
   };
 
   const handleStatusChange = async (busId: string, newStatus: string) => {
